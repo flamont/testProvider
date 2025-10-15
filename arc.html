@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Influence Network Arc Diagram</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Prevent scrollbars from appearing */
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        #my_dataviz {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v6.js"></script>
+
+    <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz"></div>
+    <script>
+        // Read data from your CSV
+        d3.csv("temporaryData.csv").then(function (csvData) {
+
+            // --- Data Transformation (happens once) ---
+            const nodeMap = new Map();
+            let idCounter = 0;
+            const links = [];
+
+            csvData.forEach(row => {
+                const prenom = row[''];
+                const nom = row.Nom;
+                const category = row['Catégorie'];
+                if (!prenom || !nom || !category) return;
+
+                const personName = `${prenom} ${nom}`.trim();
+
+                if (!nodeMap.has(personName)) {
+                    nodeMap.set(personName, { id: idCounter++, name: personName, grp: category, n: 5 });
+                }
+                if (!nodeMap.has(category)) {
+                    nodeMap.set(category, { id: idCounter++, name: category, grp: category, n: 10 });
+                }
+
+                const personNode = nodeMap.get(personName);
+                const categoryNode = nodeMap.get(category);
+                if (personNode && categoryNode) {
+                    links.push({ source: personNode.id, target: categoryNode.id });
+                }
+            });
+
+            const data = { nodes: Array.from(nodeMap.values()), links };
+            // Sort nodes alphabetically for a consistent layout
+            data.nodes.sort((a, b) => a.name.localeCompare(b.name));
+            // --- End of Data Transformation ---
+
+            const allNodes = data.nodes.map(d => d.name);
+            const allGroups = [...new Set(data.nodes.map(d => d.grp))];
+            const idToNode = {};
+            data.nodes.forEach(n => { idToNode[n.id] = n; });
+
+
+            function drawChart() {
+                // Clear any previous chart
+                d3.select("#my_dataviz svg").remove();
+
+                const container = d3.select("#my_dataviz");
+                const containerWidth = container.node().getBoundingClientRect().width;
+                const containerHeight = container.node().getBoundingClientRect().height;
+
+                const margin = { top: 20, right: 30, bottom: 150, left: 30 };
+                const width = containerWidth - margin.left - margin.right;
+                const height = containerHeight - margin.top - margin.bottom;
+
+                const svg = container.append("svg")
+                    .attr("width", containerWidth)
+                    .attr("height", containerHeight)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const color = d3.scaleOrdinal().domain(allGroups).range(d3.schemePaired);
+                const size = d3.scaleLinear().domain([1, 10]).range([2, 10]);
+                const x = d3.scalePoint().range([0, width]).domain(allNodes);
+
+                const linkPaths = svg.selectAll('mylinks').data(data.links).join('path')
+                    .attr('d', d => {
+                        const start = x(idToNode[d.source].name);
+                        const end = x(idToNode[d.target].name);
+                        return ['M', start, height, 'A', (start - end) / 2, ',', (start - end) / 2, 0, 0, ',', start < end ? 1 : 0, end, ',', height].join(' ');
+                    })
+                    .style("fill", "none").attr("stroke", "grey").style("stroke-width", 1);
+
+                const nodeCircles = svg.selectAll("mynodes").data(data.nodes).join("circle")
+                    .attr("cx", d => x(d.name))
+                    .attr("cy", height)
+                    .attr("r", d => size(d.n))
+                    .style("fill", d => color(d.grp))
+                    .attr("stroke", "white");
+
+                const labels = svg.selectAll("mylabels").data(data.nodes).join("text")
+                    .attr("x", 0).attr("y", 0)
+                    .text(d => d.name)
+                    .style("text-anchor", "end")
+                    .attr("transform", d => `translate(${x(d.name)},${height + 10}) rotate(-65)`)
+                    .style("font-size", "8px");
+
+                nodeCircles.on('mouseover', function (event, d) {
+                    nodeCircles.style('opacity', .2);
+                    d3.select(this).style('opacity', 1);
+                    linkPaths
+                        .style('stroke', a => a.source === d.id || a.target === d.id ? color(d.grp) : '#e5e7eb')
+                        .style('stroke-opacity', a => a.source === d.id || a.target === d.id ? 1 : .2)
+                        .style('stroke-width', a => a.source === d.id || a.target === d.id ? 2 : 1);
+                    labels
+                        .style("font-size", b => b.name === d.name ? "12px" : "8px")
+                        .style("font-weight", b => b.name === d.name ? "bold" : "normal");
+                }).on('mouseout', () => {
+                    nodeCircles.style('opacity', 1);
+                    linkPaths.style('stroke', 'grey').style('stroke-opacity', .8).style('stroke-width', '1');
+                    labels.style("font-size", "8px").style("font-weight", "normal");
+                });
+            }
+
+            // Initial draw
+            drawChart();
+
+            // Redraw chart on window resize
+            window.addEventListener('resize', drawChart);
+
+        }).catch(error => {
+            console.error('Error loading or parsing CSV data:', error);
+            d3.select("#my_dataviz").html(`<p style="color: red; text-align: center; padding-top: 2rem;">Error: Could not load data. Please check the file path and format.</p>`);
+        });
+    </script>
+</body>
+
+</html>

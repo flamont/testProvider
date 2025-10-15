@@ -1,8 +1,8 @@
 const dataUrl = "temporaryData.csv";
 
 const container = document.getElementById("graph-container");
-const width = container.clientWidth;
-const height = container.clientHeight;
+let width = container.clientWidth;
+let height = container.clientHeight;
 
 const svg = d3
   .select("#graph-container")
@@ -11,8 +11,10 @@ const svg = d3
 
 const tooltip = d3.select("#tooltip");
 
-const color = d3.scaleOrdinal(d3.schemeCategory10);
 const categories = "#C96C75";
+const persons = "#fff";
+const groupsAndOrganisations = "#c5c5c5";
+const borders = "#000";
 
 const simulation = d3
   .forceSimulation()
@@ -37,7 +39,7 @@ const simulation = d3
       // Set collision radius based on node type
       if (d.type === "category") return 20;
       if (d.type === "person") return 14;
-      return 1; // group
+      return 5; // group
     })
   );
 
@@ -46,17 +48,14 @@ d3.csv(dataUrl)
     const nodes = [];
     const links = [];
     const nodeSet = new Set();
-
     data.forEach((row) => {
-      const prenom = row[""]; // The first column is unnamed (Prénom)
+      const prenom = row[""];
       const nom = row.Nom;
       const category = row["Catégorie"];
-
-      if (!prenom || !nom || !category) return; // Skip rows with incomplete data
+      if (!prenom || !nom || !category) return;
 
       const personName = `${prenom} ${nom}`.trim();
 
-      // 1. Add Person Node if it doesn't exist
       if (!nodeSet.has(personName)) {
         nodeSet.add(personName);
         nodes.push({
@@ -67,21 +66,19 @@ d3.csv(dataUrl)
         });
       }
 
-      // 2. Add Category Node if it doesn't exist
       if (!nodeSet.has(category)) {
         nodeSet.add(category);
         nodes.push({
           id: category,
           type: "category",
-          category: "Category Type", // A meta-category for styling purposes
+          category: "Category Type",
           description: `The "${category}" category.`,
         });
       }
 
-      // 3. Create a link between the Person and their Category
+      //create link
       links.push({ source: personName, target: category });
 
-      // 4. Handle Group Associations
       const associations = row["Association avec un groupe?"];
       if (associations) {
         const groups = associations
@@ -108,11 +105,15 @@ d3.csv(dataUrl)
     const link = svg
       .append("g")
       .attr("class", "links")
-      .selectAll("line")
+      .selectAll("path") // Use path for curved lines
       .data(links)
       .enter()
-      .append("line")
-      .attr("class", "link");
+      .append("path") // Use path for curved lines
+      .attr("class", "link")
+      .attr("fill", "none")
+      .attr("stroke", "#999")
+      .attr("stroke-opacity", 0.6)
+      .attr("stroke-width", 1);
 
     const node = svg
       .append("g")
@@ -121,7 +122,8 @@ d3.csv(dataUrl)
       .data(nodes)
       .enter()
       .append("g")
-      .attr("class", "node-group");
+      .attr("class", "node-group")
+      .call(drag(simulation));
 
     const circles = node
       .append("circle")
@@ -131,34 +133,11 @@ d3.csv(dataUrl)
         return 4; // Small for groups
       })
       .attr("fill", (d) => {
-        if (d.type === "category") return "#C96C75";
-        if (d.type === "person") return "#fff"; // Color for people
-        return "#c5c5c5"; // groups
+        if (d.type === "category") return categories;
+        if (d.type === "person") return persons; // Color for people
+        return groupsAndOrganisations; // group && organisation
       })
-      .attr("stroke", (d) => {
-        if (d.type === "category") return "#000";
-        if (d.type === "person") return "#000"; // Color for people
-        return "#000"; // groups
-      });
-
-    //.call(drag(simulation))
-    console.log("hello");
-
-    //Labels
-    const labels = node;
-    /*  .append("text")
-      .text((d) => d.id)
-      .attr("class", "node-label")
-      .style("fill", (d) => (d.type === "category" ? "black" : "#333"))
-      .style("font-size", (d) => (d.type === "category" ? "11px" : "10px"))
-      .style("font-weight", (d) => (d.type === "category" ? "bold" : "normal"))
-      .attr("x", 0)
-      .attr("y", (d) => {
-        if (d.type === "person") return 18; // Below person node
-        if (d.type === "group") return -14; // Above group node
-        return 0; // Centered for category node
-      });
- */
+      .attr("stroke", borders);
 
     // --- Tooltip Events ---
     node
@@ -202,20 +181,28 @@ d3.csv(dataUrl)
     simulation.force("link").links(links);
 
     function ticked() {
-      link
-        .attr("x1", (d) => d.source.x)
-        .attr("y1", (d) => d.source.y)
-        .attr("x2", (d) => d.target.x)
-        .attr("y2", (d) => d.target.y);
+      link.attr("d", (d) => {
+        const dx = d.target.x - d.source.x;
+        const dy = d.target.y - d.source.y;
+        const dr = Math.sqrt(dx * dx + dy * dy);
+        // This is the SVG path command for an arc
+        return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+      });
 
-      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+      node.attr("transform", (d) => {
+        const radius =
+          d.type === "category" ? 20 : d.type === "person" ? 14 : 5;
+        d.x = Math.max(radius, Math.min(width - radius, d.x));
+        d.y = Math.max(radius, Math.min(height - radius, d.y));
+        return `translate(${d.x},${d.y})`;
+      });
     }
   })
   .catch((error) => {
-    console.error("Error loading or parsing data:", error);
-    container.innerHTML = `<div class="flex items-center justify-center h-full text-red-500 font-semibold">
-                <p>Error loading data. Please check the console and ensure 'temporaryData.csv' is accessible.</p>
-            </div>`;
+    console.error("error load data", error);
+    container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: red; font-weight: bold;">
+                    <p>Error loading data. Please check file and console.</p>
+                </div>`;
   });
 
 // --- Drag functionality ---
@@ -226,29 +213,31 @@ function drag(simulation) {
     d.fy = d.y;
   }
 
-  //   function dragged(event, d) {
-  //     d.fx = event.x;
-  //     d.fy = event.y;
-  //   }
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
 
-  //   function dragended(event, d) {
-  //     if (!event.active) simulation.alphaTarget(0);
-  //     d.fx = null;
-  //     d.fy = null;
-  //   }
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
 
-  return d3.drag();
-  /*   .on("start", dragstarted)
+  return d3
+    .drag()
+    .on("start", dragstarted)
     .on("drag", dragged)
-    .on("end", dragended); */
+    .on("end", dragended);
 }
 
-// --- Zoom functionality ---
-// const zoom = d3
-//   .zoom()
-//   .scaleExtent([0.1, 1])
-//   .on("zoom", (event) => {
-//     svg.selectAll("g").attr("transform", event.transform);
-//   });
+// --- Responsive functionality ---
+function handleResize() {
+  width = container.clientWidth;
+  height = container.clientHeight;
+  svg.attr("viewBox", [0, 0, width, height]);
+  simulation.force("center", d3.forceCenter(width / 2, height / 2));
+  simulation.alpha(0.3).restart();
+}
 
-// svg.call(zoom);
+window.addEventListener("resize", handleResize);
