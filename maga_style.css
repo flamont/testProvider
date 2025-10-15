@@ -2,13 +2,9 @@ body {
   font-family: "Inter", sans-serif;
   overflow: hidden;
   margin: 0;
-  background-color: #f3f4f6;
+  /* background-color: #f3f4f6; */
   /* background-color: #1f1f20;
-  background: linear-gradient(
-      181.25deg,
-      rgba(31, 31, 32, 1),
-      /* rgba(31, 31, 32, 1) */ rgba(0, 0, 0, 1)
-    ),
+  background: linear-gradient(181.25deg, rgba(31, 31, 32, 1), rgba(0, 0, 0, 1)),
     #1f1f20; */
 }
 

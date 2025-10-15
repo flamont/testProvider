@@ -12,6 +12,7 @@ const svg = d3
 const tooltip = d3.select("#tooltip");
 
 const color = d3.scaleOrdinal(d3.schemeCategory10);
+const categories = "#C96C75";
 
 const simulation = d3
   .forceSimulation()
@@ -129,7 +130,17 @@ d3.csv(dataUrl)
         if (d.type === "person") return 6; // Medium for people
         return 4; // Small for groups
       })
-      .attr("fill", (d) => /* color(d.category) */ "red");
+      .attr("fill", (d) => {
+        if (d.type === "category") return "#C96C75";
+        if (d.type === "person") return "#fff"; // Color for people
+        return "#c5c5c5"; // groups
+      })
+      .attr("stroke", (d) => {
+        if (d.type === "category") return "#000";
+        if (d.type === "person") return "#000"; // Color for people
+        return "#000"; // groups
+      });
+
     //.call(drag(simulation))
     console.log("hello");
 
