@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sankey Diagram - Turning Point</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0"></script>
+    <style>
+        /* Styles de base pour les nœuds et les liens */
+        .node rect {
+            /* Utilisez une opacité pour les nœuds */
+            fill-opacity: 0.9;
+            shape-rendering: crispEdges;
+        }
+
+        .node text {
+            /* Permettre l'interaction avec le texte et donner un petit contour */
+            color: #000;
+            pointer-events: none;
+            text-shadow: 0 1px 0 #fff;
+        }
+
+        .link {
+            fill: none;
+            stroke: #000;
+            stroke-opacity: 0.15;
+        }
+
+        .link:hover {
+            /* Rendre le lien plus visible au survol */
+            stroke-opacity: 0.4;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <svg id="sankey-chart" width="960" height="500"></svg>
+
+    <!--  <script>
+        // Dimensions du SVG
+        const width = 960;
+        const height = 500;
+
+        // Création de l'objet SVG
+        const svg = d3.select("#sankey-chart")
+            .attr("viewBox", [0, 0, width, height]);
+
+        // Définition de la fonction Sankey
+        const sankey = d3.sankey()
+            .nodeId(d => d.id)
+            .nodeWidth(15)
+            .nodePadding(10)
+            .extent([[1, 5], [width - 1, height - 5]]);
+
+        // Chargement des données
+        d3.json("sankey_data_turning_point.json").then(data => {
+            // Appliquer la fonction sankey aux données
+            const { nodes, links } = sankey(data);
+
+            // Définir une échelle de couleurs pour les nœuds
+            const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            // Dessiner les liens
+            const link = svg.append("g")
+                .attr("class", "links")
+                .attr("fill", "none")
+                .attr("stroke", "#000")
+                .attr("stroke-opacity", 0.2)
+                .selectAll("g")
+                .data(links)
+                .join("g")
+                .style("mix-blend-mode", "multiply");
+
+            link.append("path")
+                .attr("d", d3.sankeyLinkHorizontal())
+                .attr("stroke-width", d => Math.max(1, d.width))
+                .attr("stroke", d => color(d.source.id)); // Colorer le lien avec la couleur de la source
+
+            link.append("title")
+                .text(d => `${d.source.id} → ${d.target.id}\n${d.value}`);
+
+            // Dessiner les nœuds
+            const node = svg.append("g")
+                .attr("class", "nodes")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", 10)
+                .selectAll("g")
+                .data(nodes)
+                .join("g")
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+            node.append("rect")
+                .attr("x", 0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("fill", d => color(d.id))
+                .attr("stroke", "#000")
+                .append("title")
+                .text(d => `${d.id}\n${d.value}`);
+
+            // Ajouter les étiquettes de nœud
+            node.append("text")
+                .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+                .attr("y", d => (d.y1 + d.y0) / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+                .text(d => d.id);
+        }).catch(error => {
+            console.error("Erreur de chargement des données :", error);
+        });
+    </script> -->
+
+    <script>
+        // 🎨 Configuration pour le style Flourish 
+        const width = 960;
+        const height = 500;
+        const nodeColor = "#4682B4"; // Couleur de base pour les rectangles (SteelBlue)
+        const linkColor = "#aaa";    // Couleur de base pour les liens (Gris clair)
+
+        const svg = d3.select("#sankey-chart")
+            .attr("viewBox", [0, 0, width, height]);
+
+        const sankey = d3.sankey()
+            .nodeId(d => d.id)
+            .nodeWidth(15)
+            .nodePadding(10)
+            // Ajustez les marges si nécessaire
+            .extent([[1, 5], [width - 1, height - 5]]);
+
+        // Chargement des données
+        d3.json("sankey_data_turning_point.json").then(data => {
+            const { nodes, links } = sankey(data);
+
+            // --- 1. Dessiner les Liens ---
+            const link = svg.append("g")
+                .attr("class", "links")
+                .attr("fill", "none")
+                .attr("stroke", linkColor) // Utiliser une couleur de base
+                .attr("stroke-opacity", 0.15)
+                .selectAll("g")
+                .data(links)
+                .join("g")
+                .style("mix-blend-mode", "multiply");
+
+            link.append("path")
+                .attr("d", d3.sankeyLinkHorizontal()) // Lignes de Bézier horizontales standard
+                .attr("stroke-width", d => Math.max(1, d.width))
+                // Optionnel : Colorer le lien avec la couleur de base du nœud source
+                .attr("stroke", d => d.source.id === "Turning Point" ? nodeColor : "#aaa");
+
+            link.append("title")
+                .text(d => `${d.source.id} → ${d.target.id}\n${d.value}`);
+
+            // --- 2. Dessiner les Nœuds ---
+            const node = svg.append("g")
+                .attr("class", "nodes")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", 10)
+                .selectAll("g")
+                .data(nodes)
+                .join("g")
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+            node.append("rect")
+                .attr("x", 0)
+                .attr("height", d => d.y1 - d.y0)
+                .attr("width", d => d.x1 - d.x0)
+                .attr("fill", d => nodeColor) // Utiliser une couleur unique pour tous les nœuds
+                .attr("stroke", "#000")
+                .append("title")
+                .text(d => `${d.id}\n${d.value}`);
+
+            // --- 3. Ajouter les Libellés (Noms) ---
+            node.append("text")
+                // Position X : Décalage de 6px vers l'extérieur du rectangle
+                // Pour le nœud source (à gauche), le texte commence après le rectangle (d.x1 + 6)
+                // Pour les nœuds cibles (à droite), le texte se termine avant le rectangle (d.x0 - 6)
+                .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 60)
+                .attr("y", d => (d.y1 + d.y0) / 2) // Centrer verticalement
+                .attr("dy", "0.35em") // Alignement de la ligne de base du texte
+                // Ancrage du texte : 'start' pour les nœuds à gauche, 'end' pour les nœuds à droite
+                .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+                .text(d => d.id); // Afficher le nom du nœud
+            console.log(data)
+
+
+
+
+        }).catch(error => {
+            console.error("Erreur de chargement des données ou d'exécution D3 :", error);
+        });
+    </script>
+
+</body>
+
+</html>

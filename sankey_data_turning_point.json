@@ -1,0 +1,209 @@
+{
+    "nodes": [
+        {
+            "id": "Turning Point"
+        },
+        {
+            "id": "Brandon Tatum"
+        },
+        {
+            "id": "Charlie Kirk"
+        },
+        {
+            "id": "Candace Owens"
+        },
+        {
+            "id": "Riley Gaines"
+        },
+        {
+            "id": "Savannah Chrisley"
+        },
+        {
+            "id": "Isabel  Brown"
+        },
+        {
+            "id": "Benny Johnson"
+        },
+        {
+            "id": "Emily  Wilson"
+        },
+        {
+            "id": "Graham  Allen"
+        },
+        {
+            "id": "John Doyle"
+        },
+        {
+            "id": "Jack Posobiec"
+        },
+        {
+            "id": "Solomon Brent"
+        },
+        {
+            "id": "Allie Stuckey"
+        },
+        {
+            "id": "Rob Smith"
+        },
+        {
+            "id": "Steve Bannon"
+        },
+        {
+            "id": "Lauren Chen"
+        },
+        {
+            "id": "Katie Daviscourt"
+        },
+        {
+            "id": "Liam Donovan"
+        },
+        {
+            "id": "Tyler Tyler "
+        },
+        {
+            "id": "Julio Rosas"
+        },
+        {
+            "id": "Savanah Hernandez"
+        },
+        {
+            "id": "Cam Higby"
+        },
+        {
+            "id": "Jonathan Choe"
+        },
+        {
+            "id": "James Klug"
+        },
+        {
+            "id": "Topher Townsend"
+        }
+    ],
+    "links": [
+        {
+            "source": "Turning Point",
+            "target": "Brandon Tatum",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Charlie Kirk",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Candace Owens",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Riley Gaines",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Savannah Chrisley",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Isabel  Brown",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Benny Johnson",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Emily  Wilson",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Graham  Allen",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "John Doyle",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Jack Posobiec",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Solomon Brent",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Allie Stuckey",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Rob Smith",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Steve Bannon",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Lauren Chen",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Katie Daviscourt",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Liam Donovan",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Tyler Tyler ",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Julio Rosas",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Savanah Hernandez",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Cam Higby",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Jonathan Choe",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "James Klug",
+            "value": 1
+        },
+        {
+            "source": "Turning Point",
+            "target": "Topher Townsend",
+            "value": 1
+        }
+    ]
+}
